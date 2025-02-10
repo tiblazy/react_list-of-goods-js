@@ -44,17 +44,13 @@ export const App = () => {
   };
 
   const handleReversedGoods = () => {
-    const reverse = shownGoods.reverse();
-
     if (sortByReverse) {
       setSortByReverse(false);
-
-      return setShownGoods(shownGoods);
+    } else {
+      setSortByReverse(true);
     }
 
-    setSortByReverse(true);
-
-    return setShownGoods(reverse);
+    return setShownGoods([...shownGoods].reverse());
   };
 
   const handleResetGoods = () => {
