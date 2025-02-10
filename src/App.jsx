@@ -18,45 +18,27 @@ export const goodsFromServer = [
 const LENGTH = 'length';
 const ALPHABETIC = 'alphabetic';
 
-const queryOptions = {
-  numeric: [LENGTH],
-  string: [ALPHABETIC],
-};
-
 export const App = () => {
   const [sortBy, setSortBy] = useState(null);
-  const [sortByReverse, setSortByReverse] = useState(null);
+  const [sortByReverse, setSortByReverse] = useState(false);
   const [shownGoods, setShownGoods] = useState([...goodsFromServer]);
 
-  const handleOrganizedGoods = (goods, { sortedByType, sortedByContent }) => {
+  const handleOrganizedGoods = (goods, { sortedByType }) => {
     const organizedGoodsBy = [...goods];
 
-    if (sortedByType && sortedByContent) {
-      organizedGoodsBy.sort((good1, good2) => {
-        switch (sortedByType && sortedByContent) {
-          case sortedByType === 'numeric' &&
-            queryOptions[sortedByType].find(
-              content => content === sortedByContent,
-            ):
-            return good1.length - good2.length;
+    organizedGoodsBy.sort((good1, good2) => {
+      if (sortedByType === LENGTH) {
+        return good1.length - good2.length;
+      }
 
-          case sortedByType === 'string' &&
-            queryOptions[sortedByType].find(
-              content => content === sortedByContent,
-            ):
-            return good1.localeCompare(good2);
+      return good1.localeCompare(good2);
+    });
 
-          default:
-            return 0;
-        }
-      });
+    if (sortByReverse) {
+      setSortByReverse(false);
     }
 
-    if (sortByReverse !== null) {
-      setSortByReverse(null);
-    }
-
-    setSortBy(sortedByContent);
+    setSortBy(sortedByType);
 
     setShownGoods(organizedGoodsBy);
   };
@@ -64,20 +46,20 @@ export const App = () => {
   const handleReversedGoods = () => {
     const reverse = shownGoods.reverse();
 
-    if (sortByReverse !== null) {
-      setSortByReverse(null);
+    if (sortByReverse) {
+      setSortByReverse(false);
 
       return setShownGoods(shownGoods);
     }
 
-    setSortByReverse('reverse');
+    setSortByReverse(true);
 
     return setShownGoods(reverse);
   };
 
   const handleResetGoods = () => {
     setSortBy(null);
-    setSortByReverse(null);
+    setSortByReverse(false);
 
     return setShownGoods([...goodsFromServer]);
   };
@@ -97,8 +79,7 @@ export const App = () => {
           className={`button is-info ${!sortByReverse && sortBy === ALPHABETIC ? '' : 'is-light'}`}
           onClick={() =>
             handleOrganizedGoods(goodsFromServer, {
-              sortedByType: 'string',
-              sortedByContent: ALPHABETIC,
+              sortedByType: ALPHABETIC,
             })
           }
         >
@@ -109,8 +90,7 @@ export const App = () => {
           className={`button is-success ${!sortByReverse && sortBy === LENGTH ? '' : 'is-light'}`}
           onClick={() =>
             handleOrganizedGoods(goodsFromServer, {
-              sortedByType: 'numeric',
-              sortedByContent: LENGTH,
+              sortedByType: LENGTH,
             })
           }
         >
@@ -125,7 +105,7 @@ export const App = () => {
           Reverse
         </button>
 
-        {(sortBy !== null || sortByReverse !== null) && (
+        {(sortBy !== null || sortByReverse) && (
           <button
             type="button"
             className="button is-danger is-light"
